@@ -278,6 +278,12 @@
     .nav-item:hover .nav-del-btn { opacity: 1; }
     .nav-del-btn:hover { background: #fee; color: #c0392b !important; }
 
+    .nav-item.dragging { opacity: 0.4; }
+    .nav-item.drag-over {
+      border-top: 2px solid #1a73e8;
+      background: #f0f4ff;
+    }
+
     /* Hidden file input */
     .hidden-file { display: none; }
 
@@ -328,6 +334,7 @@
 let modules = [];
 let modCounter = 0;
 let selectedModId = null;
+let dragSrcId = null;
 
 const FILE_ICONS = {
   pdf: '📄', pptx: '📊', ipynb: '📓', py: '🐍',
@@ -489,18 +496,48 @@ function renderAll() {
 
     // Sidebar entry
     const navEl = document.createElement('div');
-    navEl.className = 'nav-item';
-    navEl.style.paddingLeft = '32px';
     navEl.className = 'nav-item' + (selectedModId === mod.id ? ' active' : '');
     navEl.style.paddingLeft = '32px';
+    navEl.draggable = true;
+    navEl.dataset.modId = mod.id;
     navEl.innerHTML = `
       <div class="nav-label" style="font-size:13px;">
-        <span class="nav-drag" style="font-size:11px;">⠿</span>
+        <span class="nav-drag" style="font-size:11px; cursor:grab;">⠿</span>
         <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${escHtml(mod.title)}</span>
       </div>
       <button class="nav-del-btn" title="Delete module" onclick="event.stopPropagation(); removeModule('${mod.id}')">✕</button>
     `;
     navEl.onclick = () => selectModule(mod.id);
+
+    navEl.addEventListener('dragstart', e => {
+      dragSrcId = mod.id;
+      navEl.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    navEl.addEventListener('dragend', () => {
+      navEl.classList.remove('dragging');
+      document.querySelectorAll('.nav-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+    });
+    navEl.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      document.querySelectorAll('.nav-item.drag-over').forEach(el => el.classList.remove('drag-over'));
+      if (dragSrcId !== mod.id) navEl.classList.add('drag-over');
+    });
+    navEl.addEventListener('dragleave', () => navEl.classList.remove('drag-over'));
+    navEl.addEventListener('drop', e => {
+      e.preventDefault();
+      navEl.classList.remove('drag-over');
+      if (dragSrcId && dragSrcId !== mod.id) {
+        const fromIdx = modules.findIndex(m => m.id === dragSrcId);
+        const toIdx   = modules.findIndex(m => m.id === mod.id);
+        const [moved] = modules.splice(fromIdx, 1);
+        modules.splice(toIdx, 0, moved);
+        dragSrcId = null;
+        renderAll();
+      }
+    });
+
     navList.appendChild(navEl);
   });
 

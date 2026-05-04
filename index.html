@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ML/DL Course Manager</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 14px;
+      color: #2d3b45;
+      background: #f5f5f5;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ── */
+    #sidebar {
+      width: 240px;
+      background: #fff;
+      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    #sidebar h2 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      padding: 16px 16px 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid #eee;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-bottom: 1px solid #f0f0f0;
+      transition: background 0.1s;
+    }
+    .nav-item:hover { background: #f7f7f7; }
+    .nav-item.active { background: #e8f0fe; border-left: 3px solid #1a73e8; }
+
+    .nav-item .nav-label { display: flex; align-items: center; gap: 8px; color: #2d3b45; }
+    .nav-item.active .nav-label { color: #1a73e8; font-weight: 600; }
+    .nav-item .nav-drag { color: #bbb; font-size: 13px; margin-right: 4px; cursor: grab; }
+    .nav-badge {
+      background: #e0e0e0;
+      border-radius: 20px;
+      font-size: 11px;
+      padding: 2px 8px;
+      color: #555;
+      font-weight: 600;
+      min-width: 24px;
+      text-align: center;
+    }
+    .nav-item.active .nav-badge { background: #1a73e8; color: #fff; }
+
+    #sidebar .add-module-btn {
+      margin: 12px 16px;
+      padding: 8px;
+      background: none;
+      border: 1px dashed #aaa;
+      border-radius: 4px;
+      color: #1a73e8;
+      font-size: 13px;
+      cursor: pointer;
+      width: calc(100% - 32px);
+      text-align: center;
+    }
+    #sidebar .add-module-btn:hover { background: #f0f4ff; }
+
+    /* ── Main ── */
+    #main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* Top bar */
+    #topbar {
+      background: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    #topbar h1 { font-size: 16px; font-weight: 600; flex: 1; }
+
+    .btn {
+      padding: 7px 14px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      background: #fff;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #2d3b45;
+      transition: background 0.1s;
+    }
+    .btn:hover { background: #f5f5f5; }
+    .btn.primary { background: #1a73e8; color: #fff; border-color: #1a73e8; }
+    .btn.primary:hover { background: #1557b0; }
+
+    /* Content area */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── Module Block ── */
+    .module-block {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    .module-header {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid #eee;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .module-header:hover { background: #fafafa; }
+    .module-header .drag-handle { color: #bbb; font-size: 13px; cursor: grab; flex-shrink: 0; }
+    .module-header .mod-title { font-size: 15px; font-weight: 600; flex: 1; }
+    .module-header .mod-title input {
+      font-size: 15px; font-weight: 600; border: none; outline: none;
+      width: 100%; background: transparent; color: #2d3b45;
+      font-family: inherit;
+    }
+    .module-header .mod-title input:focus { border-bottom: 1px solid #1a73e8; }
+    .module-header .chevron { color: #888; font-size: 12px; transition: transform 0.2s; }
+    .module-header .chevron.open { transform: rotate(180deg); }
+    .module-header .mod-count {
+      background: #e0e0e0; border-radius: 20px; font-size: 11px;
+      padding: 2px 9px; color: #555; font-weight: 600;
+    }
+
+    .mod-actions { display: flex; gap: 4px; }
+    .mod-actions button {
+      background: none; border: none; cursor: pointer; padding: 4px 7px;
+      border-radius: 3px; color: #888; font-size: 13px; transition: all 0.1s;
+    }
+    .mod-actions button:hover { background: #eee; color: #333; }
+    .mod-actions .del-btn:hover { color: #c0392b; }
+
+    /* Module body */
+    .module-body { display: none; }
+    .module-body.open { display: block; }
+
+    .module-goal {
+      padding: 10px 16px 10px 42px;
+      background: #fafafa;
+      border-bottom: 1px solid #eee;
+      font-size: 13px;
+      color: #555;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .module-goal .drag-handle { color: #ddd; flex-shrink: 0; margin-top: 2px; }
+    .module-goal textarea {
+      flex: 1; border: none; background: transparent; font-family: inherit;
+      font-size: 13px; color: #444; resize: none; outline: none; line-height: 1.5;
+    }
+    .module-goal textarea:focus { color: #2d3b45; }
+
+    /* Sub-sections */
+    .subsection {
+      border-bottom: 1px solid #eee;
+    }
+    .subsection-header {
+      display: flex; align-items: center;
+      padding: 10px 16px 10px 42px;
+      gap: 10px; cursor: pointer;
+    }
+    .subsection-header:hover { background: #f7f7f7; }
+    .subsection-header .drag-handle { color: #bbb; font-size: 12px; cursor: grab; }
+    .subsection-header .folder-icon { color: #1a73e8; }
+    .subsection-header .sec-title {
+      flex: 1; color: #1a73e8; font-weight: 500; font-size: 14px;
+    }
+    .subsection-header .sec-title input {
+      border: none; outline: none; background: transparent;
+      color: #1a73e8; font-weight: 500; font-size: 14px;
+      font-family: inherit; width: 100%;
+    }
+    .subsection-header .sec-title input:focus { border-bottom: 1px solid #1a73e8; }
+    .subsection-header .sec-chevron { color: #888; font-size: 11px; transition: transform 0.2s; }
+    .subsection-header .sec-chevron.open { transform: rotate(180deg); }
+    .subsection-header .sec-count {
+      background: #e8e8e8; border-radius: 20px; font-size: 11px;
+      padding: 2px 8px; color: #666;
+    }
+    .sec-actions button {
+      background: none; border: none; cursor: pointer; padding: 3px 6px;
+      border-radius: 3px; color: #bbb; font-size: 12px; transition: all 0.1s;
+    }
+    .sec-actions button:hover { background: #eee; color: #555; }
+
+    .subsection-body { display: none; }
+    .subsection-body.open { display: block; }
+
+    /* File row */
+    .file-row {
+      display: flex; align-items: center;
+      padding: 8px 16px 8px 60px;
+      gap: 10px; border-bottom: 1px solid #f2f2f2;
+      font-size: 13px;
+    }
+    .file-row:hover { background: #fafafa; }
+    .file-row .drag-handle { color: #ccc; font-size: 11px; cursor: grab; }
+    .file-row .f-icon { font-size: 15px; }
+    .file-row .f-name { flex: 1; color: #2d3b45; }
+    .file-row .f-size { color: #aaa; font-size: 11px; }
+    .file-row .f-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 13px; padding: 2px 5px; border-radius: 3px; }
+    .file-row .f-remove:hover { background: #fee; color: #c0392b; }
+
+    /* Drop zone inside subsection */
+    .drop-zone {
+      margin: 8px 16px 8px 60px;
+      border: 2px dashed #d0d0d0;
+      border-radius: 4px;
+      padding: 12px;
+      text-align: center;
+      color: #aaa;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: #1a73e8; color: #1a73e8; background: #f0f4ff;
+    }
+    .drop-zone input[type="file"] { display: none; }
+
+    /* Module footer actions */
+    .module-footer {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px 10px 42px;
+      border-top: 1px solid #eee;
+      background: #fafafa;
+    }
+
+    /* Upload / Create bar per module */
+    .upload-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 16px 10px 42px;
+    }
+
+    .nav-del-btn {
+      background: none; border: none; color: #ccc; cursor: pointer;
+      font-size: 11px; padding: 2px 5px; border-radius: 3px;
+      opacity: 0; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-item:hover .nav-del-btn { opacity: 1; }
+    .nav-del-btn:hover { background: #fee; color: #c0392b !important; }
+
+    /* Hidden file input */
+    .hidden-file { display: none; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background: #323232; color: #fff;
+      padding: 10px 18px; border-radius: 4px; font-size: 13px;
+      opacity: 0; transform: translateY(10px);
+      transition: all 0.3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <h2>Learning Modules</h2>
+
+  <div class="nav-item">
+    <div class="nav-label"><span>📋</span> Course Info</div>
+    <span class="nav-badge">1</span>
+  </div>
+
+  <div class="nav-item active" id="nav-modules">
+    <div class="nav-label"><span class="nav-drag">⠿</span><span>Learning Modules</span></div>
+    <span class="nav-badge" id="sidebar-count">0</span>
+  </div>
+
+  <div id="nav-module-list"></div>
+
+  <button class="add-module-btn" onclick="addModule()">+ Add Module</button>
+</div>
+
+<!-- Main -->
+<div id="main">
+  <div id="content">
+    <div id="module-list"></div>
+  </div>
+</div>
+
+<!-- Global hidden file input -->
+<input type="file" class="hidden-file" id="global-file-input" multiple />
+<div class="toast" id="toast"></div>
+
+<script>
+let modules = [];
+let modCounter = 0;
+let selectedModId = null;
+
+const FILE_ICONS = {
+  pdf: '📄', pptx: '📊', ipynb: '📓', py: '🐍',
+  csv: '📋', zip: '📦', mp4: '🎬', png: '🖼️',
+  pt: '⚙️', h5: '🗃️', default: '📁'
+};
+
+function getExt(name) { return name.split('.').pop().toLowerCase(); }
+function getIcon(name) { return FILE_ICONS[getExt(name)] || FILE_ICONS.default; }
+function fmtSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
+  return (b/1048576).toFixed(1) + ' MB';
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+/* ── Add Module ── */
+function addModule() {
+  modCounter++;
+  const id = 'mod-' + modCounter;
+  const mod = { id, title: 'Module ' + modCounter, goal: '', sections: [], open: true };
+  modules.push(mod);
+  renderAll();
+}
+
+/* ── Add Section to module ── */
+function addSection(modId) {
+  const mod = modules.find(m => m.id === modId);
+  if (!mod) return;
+  const sid = modId + '-sec-' + Date.now();
+  mod.sections.push({ id: sid, title: 'New Section', files: [], open: true });
+  renderAll();
+  setTimeout(() => {
+    const inp = document.querySelector(`[data-sec-id="${sid}"] .sec-inp`);
+    if (inp) { inp.focus(); inp.select(); }
+  }, 50);
+}
+
+/* ── Remove module ── */
+function removeModule(modId) {
+  modules = modules.filter(m => m.id !== modId);
+  if (selectedModId === modId) selectedModId = null;
+  renderAll();
+}
+
+/* ── Remove section ── */
+function removeSection(modId, secId) {
+  const mod = modules.find(m => m.id === modId);
+  if (!mod) return;
+  mod.sections = mod.sections.filter(s => s.id !== secId);
+  renderAll();
+}
+
+/* ── Remove file ── */
+function removeFile(secId, fileIdx) {
+  for (const mod of modules) {
+    const sec = mod.sections.find(s => s.id === secId);
+    if (sec) { sec.files.splice(fileIdx, 1); break; }
+  }
+  renderAll();
+}
+
+/* ── Toggle module ── */
+function toggleModule(modId) {
+  const mod = modules.find(m => m.id === modId);
+  if (mod) { mod.open = !mod.open; renderAll(); }
+}
+
+/* ── Toggle section ── */
+function toggleSection(modId, secId) {
+  const mod = modules.find(m => m.id === modId);
+  if (!mod) return;
+  const sec = mod.sections.find(s => s.id === secId);
+  if (sec) { sec.open = !sec.open; renderAll(); }
+}
+
+/* ── File handling ── */
+function handleFiles(files, secId) {
+  for (const mod of modules) {
+    const sec = mod.sections.find(s => s.id === secId);
+    if (sec) {
+      [...files].forEach(f => {
+        if (!sec.files.find(x => x.name === f.name)) {
+          sec.files.push({ name: f.name, size: f.size });
+        }
+      });
+      break;
+    }
+  }
+  renderAll();
+  toast('Files added successfully.');
+}
+
+/* ── Drag events ── */
+function onDragOver(e, secId) {
+  e.preventDefault();
+  const dz = document.querySelector(`[data-dz="${secId}"]`);
+  if (dz) dz.classList.add('dragover');
+}
+function onDragLeave(e, secId) {
+  const dz = document.querySelector(`[data-dz="${secId}"]`);
+  if (dz) dz.classList.remove('dragover');
+}
+function onDrop(e, secId) {
+  e.preventDefault();
+  onDragLeave(e, secId);
+  handleFiles(e.dataTransfer.files, secId);
+}
+
+/* ── Expand / Collapse all ── */
+function expandAll()  { modules.forEach(m => { m.open = true;  m.sections.forEach(s => s.open = true);  }); renderAll(); }
+function collapseAll(){ modules.forEach(m => { m.open = false; m.sections.forEach(s => s.open = false); }); renderAll(); }
+
+/* ── Global upload ── */
+function openGlobalUpload() {
+  if (modules.length === 0) { toast('Add a module first.'); return; }
+  // Upload to first module's first section, or create one
+  const mod = modules[0];
+  if (mod.sections.length === 0) {
+    mod.sections.push({ id: mod.id+'-sec-default', title: 'General', files: [], open: true });
+    renderAll();
+  }
+  triggerUpload(mod.sections[0].id);
+}
+
+function triggerUpload(secId) {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.multiple = true;
+  inp.onchange = () => handleFiles(inp.files, secId);
+  inp.click();
+}
+
+/* ── Save ── */
+function saveAll() {
+  toast('Course saved ✓');
+}
+
+/* ── Render ── */
+function selectModule(modId) {
+  selectedModId = modId;
+  renderAll();
+}
+
+function renderAll() {
+  const container = document.getElementById('module-list');
+  container.innerHTML = '';
+
+  // Sidebar nav
+  const navList = document.getElementById('nav-module-list');
+  navList.innerHTML = '';
+  document.getElementById('sidebar-count').textContent = modules.length;
+
+  modules.forEach(mod => {
+
+    // Sidebar entry
+    const navEl = document.createElement('div');
+    navEl.className = 'nav-item';
+    navEl.style.paddingLeft = '32px';
+    navEl.className = 'nav-item' + (selectedModId === mod.id ? ' active' : '');
+    navEl.style.paddingLeft = '32px';
+    navEl.innerHTML = `
+      <div class="nav-label" style="font-size:13px;">
+        <span class="nav-drag" style="font-size:11px;">⠿</span>
+        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${escHtml(mod.title)}</span>
+      </div>
+      <button class="nav-del-btn" title="Delete module" onclick="event.stopPropagation(); removeModule('${mod.id}')">✕</button>
+    `;
+    navEl.onclick = () => selectModule(mod.id);
+    navList.appendChild(navEl);
+  });
+
+  // Show selected module name in main area
+  if (selectedModId) {
+    const mod = modules.find(m => m.id === selectedModId);
+    if (mod) {
+      const title = document.createElement('div');
+      title.style.cssText = 'padding: 40px 20px; font-size: 22px; font-weight: 600; color: #2d3b45;';
+      title.textContent = mod.title;
+      container.appendChild(title);
+    }
+  }
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Seed with default ML/DL modules ──
+const defaults = [
+  { title: 'Start Here', goal: 'Course overview, tools setup, and expectations.', sections: ['Course Intro', 'Setup & Environment'] },
+  { title: 'M1: Foundations of ML',    goal: 'Linear models, loss functions, gradient descent.', sections: ['Lecture Slides', 'Lab Notebooks'] },
+  { title: 'M2: Neural Networks',       goal: 'MLP, backpropagation, activation functions.', sections: ['Lecture Slides', 'Lab Notebooks', 'Datasets'] },
+  { title: 'M3: Optimization',          goal: 'SGD, Adam, learning rate schedules, regularization.', sections: ['Lecture Slides', 'Lab Notebooks'] },
+  { title: 'M4: CNNs',                  goal: 'Convolutions, pooling, ResNet, EfficientNet.', sections: ['Lecture Slides', 'Lab Notebooks', 'Datasets'] },
+  { title: 'M5: Transformers & Attention', goal: 'Self-attention, BERT, ViT, scaling laws.', sections: ['Lecture Slides', 'Lab Notebooks'] },
+  { title: 'M6: Efficient AI',          goal: 'Model compression, quantization, pruning, energy-aware training.', sections: ['Lecture Slides', 'Papers', 'Lab Notebooks'] },
+  { title: 'M7: Privacy-Preserving ML', goal: 'Federated learning, differential privacy, secure aggregation.', sections: ['Lecture Slides', 'Papers', 'Lab Notebooks'] },
+];
+
+defaults.forEach(d => {
+  modCounter++;
+  const id = 'mod-' + modCounter;
+  const sections = d.sections.map(title => ({
+    id: id + '-sec-' + Math.random().toString(36).slice(2),
+    title, files: [], open: false
+  }));
+  modules.push({ id, title: d.title, goal: d.goal, sections, open: false });
+});
+
+renderAll();
+</script>
+</body>
+</html>

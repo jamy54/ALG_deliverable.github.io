@@ -6,578 +6,577 @@
   <title>ML/DL Course Manager</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 14px;
-      color: #2d3b45;
-      background: #f5f5f5;
-      display: flex;
-      height: 100vh;
-      overflow: hidden;
+      font-size: 14px; color: #2d3b45; background: #f5f5f5;
+      display: flex; height: 100vh; overflow: hidden;
     }
 
     /* ── Sidebar ── */
     #sidebar {
-      width: 240px;
-      background: #fff;
-      border-right: 1px solid #ddd;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      flex-shrink: 0;
+      width: 240px; background: #fff; border-right: 1px solid #ddd;
+      display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0;
     }
-
     #sidebar h2 {
-      font-size: 13px;
-      font-weight: 600;
-      color: #555;
-      padding: 16px 16px 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid #eee;
+      font-size: 13px; font-weight: 600; color: #555;
+      padding: 16px 16px 8px; text-transform: uppercase;
+      letter-spacing: 0.05em; border-bottom: 1px solid #eee; flex-shrink: 0;
+    }
+    .nav-static {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid #f0f0f0;
+    }
+    .nav-badge {
+      background: #e0e0e0; border-radius: 20px; font-size: 11px;
+      padding: 2px 8px; color: #555; font-weight: 600;
     }
 
+    /* Group header */
+    .group-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 10px; cursor: pointer;
+      background: #f0f4ff; border-bottom: 1px solid #d5e2fb;
+      border-top: 2px solid #d5e2fb; user-select: none; flex-shrink: 0;
+    }
+    .group-header:hover { background: #e2ecff; }
+    .grp-left { display: flex; align-items: center; gap: 6px; flex: 1; min-width: 0; }
+    .grp-chevron { color: #1a73e8; font-size: 9px; transition: transform 0.2s; flex-shrink: 0; }
+    .grp-chevron.open { transform: rotate(90deg); }
+    .grp-title-text {
+      font-size: 11px; font-weight: 700; color: #1a73e8;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px;
+    }
+    .grp-title-input {
+      border: none; outline: none; background: transparent;
+      font-size: 11px; font-weight: 700; font-family: inherit;
+      color: #1a73e8; text-transform: uppercase; letter-spacing: 0.06em;
+      border-bottom: 1.5px solid #1a73e8; max-width: 100px; width: 100px; padding: 0;
+    }
+    .grp-badge {
+      background: #1a73e8; color: #fff; border-radius: 20px;
+      font-size: 10px; padding: 1px 6px; font-weight: 700; flex-shrink: 0;
+    }
+    .grp-actions { display: flex; gap: 1px; align-items: center; flex-shrink: 0; }
+    .grp-add-btn, .grp-rename-btn, .grp-del-btn {
+      background: none; border: none; cursor: pointer; padding: 2px 5px;
+      border-radius: 3px; font-size: 12px; color: #7a9fd4;
+      opacity: 0; transition: all 0.15s;
+    }
+    .group-header:hover .grp-add-btn,
+    .group-header:hover .grp-rename-btn,
+    .group-header:hover .grp-del-btn { opacity: 1; }
+    .grp-add-btn:hover { background: #e8f0fe; color: #1a73e8 !important; }
+    .grp-rename-btn:hover { background: #e8f0fe; color: #1a73e8 !important; }
+    .grp-del-btn:hover { background: #fee; color: #c0392b !important; }
+
+    /* Nav module item */
     .nav-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 16px;
-      cursor: pointer;
-      border-bottom: 1px solid #f0f0f0;
-      transition: background 0.1s;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 12px 9px 32px; cursor: pointer;
+      border-bottom: 1px solid #f0f0f0; transition: background 0.1s;
     }
     .nav-item:hover { background: #f7f7f7; }
-    .nav-item.active { background: #e8f0fe; border-left: 3px solid #1a73e8; }
-
-    .nav-item .nav-label { display: flex; align-items: center; gap: 8px; color: #2d3b45; }
+    .nav-item.active { background: #e8f0fe; border-left: 3px solid #1a73e8; padding-left: 29px; }
+    .nav-item .nav-label { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; }
     .nav-item.active .nav-label { color: #1a73e8; font-weight: 600; }
-    .nav-item .nav-drag { color: #bbb; font-size: 13px; margin-right: 4px; cursor: grab; }
-    .nav-badge {
-      background: #e0e0e0;
-      border-radius: 20px;
-      font-size: 11px;
-      padding: 2px 8px;
-      color: #555;
-      font-weight: 600;
-      min-width: 24px;
-      text-align: center;
+    .nav-drag { color: #ccc; font-size: 12px; cursor: grab; flex-shrink: 0; }
+    .nav-title-text {
+      font-size: 13px; white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; max-width: 110px;
     }
-    .nav-item.active .nav-badge { background: #1a73e8; color: #fff; }
+    .nav-title-input {
+      border: none; outline: none; background: #fff;
+      font-size: 13px; font-family: inherit; color: #1a73e8; font-weight: 600;
+      border-bottom: 1.5px solid #1a73e8; max-width: 110px; width: 110px; padding: 0;
+    }
+    .nav-item-actions { display: flex; align-items: center; gap: 1px; flex-shrink: 0; }
+    .nav-rename-btn, .nav-del-btn {
+      background: none; border: none; cursor: pointer; padding: 2px 5px;
+      border-radius: 3px; font-size: 11px; color: #ccc; opacity: 0; transition: all 0.15s;
+    }
+    .nav-item:hover .nav-rename-btn,
+    .nav-item:hover .nav-del-btn { opacity: 1; }
+    .nav-rename-btn:hover { background: #e8f0fe; color: #1a73e8 !important; }
+    .nav-del-btn:hover { background: #fee; color: #c0392b !important; }
+    .nav-item.dragging { opacity: 0.4; }
+    .nav-item.drag-over { border-top: 2px solid #1a73e8; background: #f0f4ff; }
 
-    #sidebar .add-module-btn {
-      margin: 12px 16px;
-      padding: 8px;
-      background: none;
-      border: 1px dashed #aaa;
-      border-radius: 4px;
-      color: #1a73e8;
-      font-size: 13px;
-      cursor: pointer;
-      width: calc(100% - 32px);
-      text-align: center;
+    /* Sidebar footer */
+    .sidebar-footer { padding: 10px 16px; border-top: 1px solid #eee; flex-shrink: 0; }
+    .add-group-btn {
+      padding: 7px; background: none; border: 1px dashed #bbb; border-radius: 4px;
+      color: #888; font-size: 12px; cursor: pointer; width: 100%;
+      text-align: center; display: block; transition: all 0.15s;
     }
-    #sidebar .add-module-btn:hover { background: #f0f4ff; }
+    .add-group-btn:hover { border-color: #1a73e8; color: #1a73e8; background: #f0f4ff; }
 
     /* ── Main ── */
-    #main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+    #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    #content { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; }
 
-    /* Top bar */
-    #topbar {
-      background: #fff;
-      border-bottom: 1px solid #ddd;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
+    /* Module cards in main */
+    .module-card {
+      background: #fff; border: 1px solid #ddd; border-radius: 6px;
+      cursor: pointer; transition: box-shadow 0.15s;
     }
-
-    #topbar h1 { font-size: 16px; font-weight: 600; flex: 1; }
-
-    .btn {
-      padding: 7px 14px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      background: #fff;
-      font-size: 13px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #2d3b45;
-      transition: background 0.1s;
+    .module-card:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .module-card-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px; border-bottom: 1px solid #f0f0f0;
     }
-    .btn:hover { background: #f5f5f5; }
-    .btn.primary { background: #1a73e8; color: #fff; border-color: #1a73e8; }
-    .btn.primary:hover { background: #1557b0; }
-
-    /* Content area */
-    #content {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    /* ── Module Block ── */
-    .module-block {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-
-    .module-header {
-      display: flex;
-      align-items: center;
-      padding: 14px 16px;
-      border-bottom: 1px solid #eee;
-      gap: 10px;
-      cursor: pointer;
-      user-select: none;
-    }
-    .module-header:hover { background: #fafafa; }
-    .module-header .drag-handle { color: #bbb; font-size: 13px; cursor: grab; flex-shrink: 0; }
-    .module-header .mod-title { font-size: 15px; font-weight: 600; flex: 1; }
-    .module-header .mod-title input {
-      font-size: 15px; font-weight: 600; border: none; outline: none;
-      width: 100%; background: transparent; color: #2d3b45;
-      font-family: inherit;
-    }
-    .module-header .mod-title input:focus { border-bottom: 1px solid #1a73e8; }
-    .module-header .chevron { color: #888; font-size: 12px; transition: transform 0.2s; }
-    .module-header .chevron.open { transform: rotate(180deg); }
-    .module-header .mod-count {
+    .module-card-title { font-size: 15px; font-weight: 600; flex: 1; }
+    .module-card-count {
       background: #e0e0e0; border-radius: 20px; font-size: 11px;
       padding: 2px 9px; color: #555; font-weight: 600;
     }
+    .module-card-goal { padding: 10px 16px; font-size: 13px; color: #666; line-height: 1.6; }
 
-    .mod-actions { display: flex; gap: 4px; }
-    .mod-actions button {
-      background: none; border: none; cursor: pointer; padding: 4px 7px;
-      border-radius: 3px; color: #888; font-size: 13px; transition: all 0.1s;
+    /* Section view */
+    .section-block { background: #fff; border: 1px solid #ddd; border-radius: 6px; }
+    .section-header {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; border-bottom: 1px solid #eee;
+      cursor: pointer; user-select: none;
     }
-    .mod-actions button:hover { background: #eee; color: #333; }
-    .mod-actions .del-btn:hover { color: #c0392b; }
-
-    /* Module body */
-    .module-body { display: none; }
-    .module-body.open { display: block; }
-
-    .module-goal {
-      padding: 10px 16px 10px 42px;
-      background: #fafafa;
-      border-bottom: 1px solid #eee;
-      font-size: 13px;
-      color: #555;
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-    .module-goal .drag-handle { color: #ddd; flex-shrink: 0; margin-top: 2px; }
-    .module-goal textarea {
-      flex: 1; border: none; background: transparent; font-family: inherit;
-      font-size: 13px; color: #444; resize: none; outline: none; line-height: 1.5;
-    }
-    .module-goal textarea:focus { color: #2d3b45; }
-
-    /* Sub-sections */
-    .subsection {
-      border-bottom: 1px solid #eee;
-    }
-    .subsection-header {
-      display: flex; align-items: center;
-      padding: 10px 16px 10px 42px;
-      gap: 10px; cursor: pointer;
-    }
-    .subsection-header:hover { background: #f7f7f7; }
-    .subsection-header .drag-handle { color: #bbb; font-size: 12px; cursor: grab; }
-    .subsection-header .folder-icon { color: #1a73e8; }
-    .subsection-header .sec-title {
-      flex: 1; color: #1a73e8; font-weight: 500; font-size: 14px;
-    }
-    .subsection-header .sec-title input {
-      border: none; outline: none; background: transparent;
-      color: #1a73e8; font-weight: 500; font-size: 14px;
-      font-family: inherit; width: 100%;
-    }
-    .subsection-header .sec-title input:focus { border-bottom: 1px solid #1a73e8; }
-    .subsection-header .sec-chevron { color: #888; font-size: 11px; transition: transform 0.2s; }
-    .subsection-header .sec-chevron.open { transform: rotate(180deg); }
-    .subsection-header .sec-count {
+    .section-header:hover { background: #fafafa; }
+    .section-title { font-size: 14px; font-weight: 600; color: #1a73e8; flex: 1; }
+    .section-count {
       background: #e8e8e8; border-radius: 20px; font-size: 11px;
       padding: 2px 8px; color: #666;
     }
-    .sec-actions button {
-      background: none; border: none; cursor: pointer; padding: 3px 6px;
-      border-radius: 3px; color: #bbb; font-size: 12px; transition: all 0.1s;
-    }
-    .sec-actions button:hover { background: #eee; color: #555; }
+    .section-chevron { color: #888; font-size: 11px; transition: transform 0.2s; }
+    .section-chevron.open { transform: rotate(180deg); }
+    .section-body { display: none; }
+    .section-body.open { display: block; }
 
-    .subsection-body { display: none; }
-    .subsection-body.open { display: block; }
-
-    /* File row */
     .file-row {
-      display: flex; align-items: center;
-      padding: 8px 16px 8px 60px;
-      gap: 10px; border-bottom: 1px solid #f2f2f2;
-      font-size: 13px;
+      display: flex; align-items: center; padding: 8px 16px 8px 40px;
+      gap: 10px; border-bottom: 1px solid #f2f2f2; font-size: 13px;
     }
     .file-row:hover { background: #fafafa; }
-    .file-row .drag-handle { color: #ccc; font-size: 11px; cursor: grab; }
-    .file-row .f-icon { font-size: 15px; }
-    .file-row .f-name { flex: 1; color: #2d3b45; }
-    .file-row .f-size { color: #aaa; font-size: 11px; }
-    .file-row .f-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 13px; padding: 2px 5px; border-radius: 3px; }
-    .file-row .f-remove:hover { background: #fee; color: #c0392b; }
+    .f-icon { font-size: 15px; }
+    .f-name { flex: 1; color: #2d3b45; }
+    .f-size { color: #aaa; font-size: 11px; }
+    .f-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 13px; padding: 2px 5px; border-radius: 3px; }
+    .f-remove:hover { background: #fee; color: #c0392b; }
 
-    /* Drop zone inside subsection */
     .drop-zone {
-      margin: 8px 16px 8px 60px;
-      border: 2px dashed #d0d0d0;
-      border-radius: 4px;
-      padding: 12px;
-      text-align: center;
-      color: #aaa;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.15s;
+      margin: 10px 16px 10px 40px; border: 2px dashed #d0d0d0; border-radius: 4px;
+      padding: 12px; text-align: center; color: #aaa; font-size: 12px;
+      cursor: pointer; transition: all 0.15s;
     }
-    .drop-zone:hover, .drop-zone.dragover {
-      border-color: #1a73e8; color: #1a73e8; background: #f0f4ff;
-    }
-    .drop-zone input[type="file"] { display: none; }
+    .drop-zone:hover, .drop-zone.dragover { border-color: #1a73e8; color: #1a73e8; background: #f0f4ff; }
 
-    /* Module footer actions */
-    .module-footer {
+    /* Breadcrumb + back button */
+    .breadcrumb {
       display: flex; align-items: center; gap: 8px;
-      padding: 10px 16px 10px 42px;
-      border-top: 1px solid #eee;
-      background: #fafafa;
+      font-size: 13px; color: #888; margin-bottom: 4px;
+    }
+    .breadcrumb .back-btn {
+      background: none; border: none; color: #1a73e8; cursor: pointer;
+      font-size: 13px; padding: 2px 6px; border-radius: 3px;
+    }
+    .breadcrumb .back-btn:hover { background: #e8f0fe; }
+    .page-title {
+      font-size: 22px; font-weight: 700; color: #2d3b45;
+      padding-bottom: 12px; border-bottom: 2px solid #eaedf0;
+      margin-bottom: 16px;
+    }
+    .page-goal { font-size: 14px; color: #555; line-height: 1.7; margin-bottom: 16px; }
+    .group-label {
+      font-size: 11px; font-weight: 700; color: #1a73e8;
+      text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px;
+    }
+    .group-section-block { margin-bottom: 20px; }
+    .group-section-heading {
+      font-size: 11px; font-weight: 700; color: #1a73e8;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      padding: 0 0 8px; border-bottom: 2px solid #e0ecff; margin-bottom: 8px;
     }
 
-    /* Upload / Create bar per module */
-    .upload-bar {
-      display: flex; align-items: center; gap: 8px;
-      padding: 10px 16px 10px 42px;
+    .add-section-btn {
+      margin: 8px 0; padding: 7px 14px; background: none;
+      border: 1px dashed #bbb; border-radius: 4px; color: #888;
+      font-size: 12px; cursor: pointer; transition: all 0.15s;
     }
+    .add-section-btn:hover { border-color: #1a73e8; color: #1a73e8; background: #f0f4ff; }
 
-    .nav-del-btn {
-      background: none; border: none; color: #ccc; cursor: pointer;
-      font-size: 11px; padding: 2px 5px; border-radius: 3px;
-      opacity: 0; transition: all 0.15s; flex-shrink: 0;
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; height: 50vh; color: #aaa; gap: 12px;
     }
-    .nav-item:hover .nav-del-btn { opacity: 1; }
-    .nav-del-btn:hover { background: #fee; color: #c0392b !important; }
+    .empty-state .ei { font-size: 48px; opacity: 0.4; }
+    .empty-state p { font-size: 14px; text-align: center; line-height: 1.6; }
 
-    .nav-item.dragging { opacity: 0.4; }
-    .nav-item.drag-over {
-      border-top: 2px solid #1a73e8;
-      background: #f0f4ff;
-    }
-
-    /* Hidden file input */
     .hidden-file { display: none; }
-
-    /* Toast */
     .toast {
       position: fixed; bottom: 20px; right: 20px;
-      background: #323232; color: #fff;
-      padding: 10px 18px; border-radius: 4px; font-size: 13px;
-      opacity: 0; transform: translateY(10px);
-      transition: all 0.3s; pointer-events: none;
+      background: #323232; color: #fff; padding: 10px 18px;
+      border-radius: 4px; font-size: 13px; opacity: 0;
+      transform: translateY(10px); transition: all 0.3s;
+      pointer-events: none; z-index: 999;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
 
-<!-- Sidebar -->
 <div id="sidebar">
   <h2>Learning Modules</h2>
 
-  <div class="nav-item">
-    <div class="nav-label"><span>📋</span> Course Info</div>
-    <span class="nav-badge">1</span>
-  </div>
-
-  <div class="nav-item active" id="nav-modules">
-    <div class="nav-label"><span class="nav-drag">⠿</span><span>Learning Modules</span></div>
+  <div class="nav-static" style="background:#f7f7f7;justify-content:flex-end;">
     <span class="nav-badge" id="sidebar-count">0</span>
   </div>
 
   <div id="nav-module-list"></div>
 
-  <button class="add-module-btn" onclick="addModule()">+ Add Module</button>
+  <div class="sidebar-footer">
+    <button class="add-group-btn" onclick="addGroup()">+ Add Group</button>
+  </div>
 </div>
 
-<!-- Main -->
 <div id="main">
   <div id="content">
     <div id="module-list"></div>
   </div>
 </div>
 
-<!-- Global hidden file input -->
 <input type="file" class="hidden-file" id="global-file-input" multiple />
 <div class="toast" id="toast"></div>
 
 <script>
-let modules = [];
+let groups = [];
+let groupCounter = 0;
 let modCounter = 0;
 let selectedModId = null;
 let dragSrcId = null;
+let dragSrcGroupId = null;
 
 const FILE_ICONS = {
-  pdf: '📄', pptx: '📊', ipynb: '📓', py: '🐍',
-  csv: '📋', zip: '📦', mp4: '🎬', png: '🖼️',
-  pt: '⚙️', h5: '🗃️', default: '📁'
+  pdf:'📄', pptx:'📊', ipynb:'📓', py:'🐍',
+  csv:'📋', zip:'📦', mp4:'🎬', png:'🖼️', pt:'⚙️', h5:'🗃️', default:'📁'
 };
 
-function getExt(name) { return name.split('.').pop().toLowerCase(); }
-function getIcon(name) { return FILE_ICONS[getExt(name)] || FILE_ICONS.default; }
-function fmtSize(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1048576) return (b/1024).toFixed(1) + ' KB';
-  return (b/1048576).toFixed(1) + ' MB';
-}
+function getExt(n){ return n.split('.').pop().toLowerCase(); }
+function getIcon(n){ return FILE_ICONS[getExt(n)] || FILE_ICONS.default; }
+function fmtSize(b){ if(b<1024)return b+' B'; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
+function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
 
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
+function findMod(modId){
+  for(const g of groups){ const m=g.modules.find(m=>m.id===modId); if(m)return{group:g,mod:m}; }
+  return null;
+}
+function allMods(){ return groups.flatMap(g=>g.modules); }
+
+/* ── Add Group ── */
+function addGroup(){
+  groupCounter++;
+  const id='grp-'+groupCounter;
+  groups.push({id,title:'New Group',open:true,modules:[]});
+  renderAll();
+  setTimeout(()=>startRenameGroup(id),30);
 }
 
 /* ── Add Module ── */
-function addModule() {
+function addModule(groupId){
+  const g=groups.find(g=>g.id===groupId);
+  if(!g)return;
   modCounter++;
-  const id = 'mod-' + modCounter;
-  const mod = { id, title: 'Module ' + modCounter, goal: '', sections: [], open: true };
-  modules.push(mod);
+  const id='mod-'+modCounter;
+  g.modules.push({id,title:'New Module',goal:'',sections:[],open:false});
   renderAll();
+  setTimeout(()=>startRenameNav(id),30);
 }
 
-/* ── Add Section to module ── */
-function addSection(modId) {
-  const mod = modules.find(m => m.id === modId);
-  if (!mod) return;
-  const sid = modId + '-sec-' + Date.now();
-  mod.sections.push({ id: sid, title: 'New Section', files: [], open: true });
+/* ── Remove Group ── */
+function removeGroup(groupId){
+  const g=groups.find(g=>g.id===groupId);
+  if(!g)return;
+  if(g.modules.some(m=>m.id===selectedModId))selectedModId=null;
+  groups=groups.filter(g=>g.id!==groupId);
   renderAll();
-  setTimeout(() => {
-    const inp = document.querySelector(`[data-sec-id="${sid}"] .sec-inp`);
-    if (inp) { inp.focus(); inp.select(); }
-  }, 50);
+  toast('Group deleted.');
 }
 
-/* ── Remove module ── */
-function removeModule(modId) {
-  modules = modules.filter(m => m.id !== modId);
-  if (selectedModId === modId) selectedModId = null;
-  renderAll();
-}
-
-/* ── Remove section ── */
-function removeSection(modId, secId) {
-  const mod = modules.find(m => m.id === modId);
-  if (!mod) return;
-  mod.sections = mod.sections.filter(s => s.id !== secId);
-  renderAll();
-}
-
-/* ── Remove file ── */
-function removeFile(secId, fileIdx) {
-  for (const mod of modules) {
-    const sec = mod.sections.find(s => s.id === secId);
-    if (sec) { sec.files.splice(fileIdx, 1); break; }
+/* ── Remove Module ── */
+function removeModule(modId){
+  for(const g of groups){
+    const i=g.modules.findIndex(m=>m.id===modId);
+    if(i!==-1){
+      g.modules.splice(i,1);
+      if(selectedModId===modId)selectedModId=null;
+      renderAll(); return;
+    }
   }
-  renderAll();
 }
 
-/* ── Toggle module ── */
-function toggleModule(modId) {
-  const mod = modules.find(m => m.id === modId);
-  if (mod) { mod.open = !mod.open; renderAll(); }
-}
-
-/* ── Toggle section ── */
-function toggleSection(modId, secId) {
-  const mod = modules.find(m => m.id === modId);
-  if (!mod) return;
-  const sec = mod.sections.find(s => s.id === secId);
-  if (sec) { sec.open = !sec.open; renderAll(); }
+/* ── Toggle Group ── */
+function toggleGroup(groupId){
+  const g=groups.find(g=>g.id===groupId);
+  if(g){g.open=!g.open; renderAll();}
 }
 
 /* ── File handling ── */
-function handleFiles(files, secId) {
-  for (const mod of modules) {
-    const sec = mod.sections.find(s => s.id === secId);
-    if (sec) {
-      [...files].forEach(f => {
-        if (!sec.files.find(x => x.name === f.name)) {
-          sec.files.push({ name: f.name, size: f.size });
-        }
-      });
-      break;
+function handleFiles(files,secId){
+  for(const mod of allMods()){
+    const sec=mod.sections.find(s=>s.id===secId);
+    if(sec){
+      [...files].forEach(f=>{ if(!sec.files.find(x=>x.name===f.name))sec.files.push({name:f.name,size:f.size}); });
+      renderAll(); toast('Files added.'); return;
     }
   }
+}
+function onDragOver(e,sid){ e.preventDefault(); const d=document.querySelector(`[data-dz="${sid}"]`); if(d)d.classList.add('dragover'); }
+function onDragLeave(e,sid){ const d=document.querySelector(`[data-dz="${sid}"]`); if(d)d.classList.remove('dragover'); }
+function onDrop(e,sid){ e.preventDefault(); onDragLeave(e,sid); handleFiles(e.dataTransfer.files,sid); }
+function triggerUpload(secId){ const i=document.createElement('input'); i.type='file'; i.multiple=true; i.onchange=()=>handleFiles(i.files,secId); i.click(); }
+
+function addSection(modId){
+  const f=findMod(modId); if(!f)return;
+  const sid=modId+'-sec-'+Date.now();
+  f.mod.sections.push({id:sid,title:'New Section',files:[],open:true});
   renderAll();
-  toast('Files added successfully.');
+  setTimeout(()=>{ const inp=document.querySelector(`[data-sec-id="${sid}"] .sec-inp`); if(inp){inp.focus();inp.select();} },50);
 }
 
-/* ── Drag events ── */
-function onDragOver(e, secId) {
-  e.preventDefault();
-  const dz = document.querySelector(`[data-dz="${secId}"]`);
-  if (dz) dz.classList.add('dragover');
-}
-function onDragLeave(e, secId) {
-  const dz = document.querySelector(`[data-dz="${secId}"]`);
-  if (dz) dz.classList.remove('dragover');
-}
-function onDrop(e, secId) {
-  e.preventDefault();
-  onDragLeave(e, secId);
-  handleFiles(e.dataTransfer.files, secId);
-}
-
-/* ── Expand / Collapse all ── */
-function expandAll()  { modules.forEach(m => { m.open = true;  m.sections.forEach(s => s.open = true);  }); renderAll(); }
-function collapseAll(){ modules.forEach(m => { m.open = false; m.sections.forEach(s => s.open = false); }); renderAll(); }
-
-/* ── Global upload ── */
-function openGlobalUpload() {
-  if (modules.length === 0) { toast('Add a module first.'); return; }
-  // Upload to first module's first section, or create one
-  const mod = modules[0];
-  if (mod.sections.length === 0) {
-    mod.sections.push({ id: mod.id+'-sec-default', title: 'General', files: [], open: true });
-    renderAll();
+function removeFile(secId,idx){
+  for(const mod of allMods()){
+    const sec=mod.sections.find(s=>s.id===secId);
+    if(sec){sec.files.splice(idx,1);renderAll();return;}
   }
-  triggerUpload(mod.sections[0].id);
 }
 
-function triggerUpload(secId) {
-  const inp = document.createElement('input');
-  inp.type = 'file'; inp.multiple = true;
-  inp.onchange = () => handleFiles(inp.files, secId);
-  inp.click();
+function toggleSection(secId){
+  for(const mod of allMods()){
+    const sec=mod.sections.find(s=>s.id===secId);
+    if(sec){sec.open=!sec.open;renderAll();return;}
+  }
 }
 
-/* ── Save ── */
-function saveAll() {
-  toast('Course saved ✓');
+/* ── Rename Group ── */
+function startRenameGroup(groupId){
+  const group=groups.find(g=>g.id===groupId); if(!group)return;
+  const span=document.querySelector(`.grp-title-text[data-grp-id="${groupId}"]`); if(!span)return;
+  const inp=document.createElement('input');
+  inp.type='text'; inp.className='grp-title-input'; inp.value=group.title;
+  span.parentNode.replaceChild(inp,span);
+  inp.focus(); inp.select();
+  let saved=false;
+  const save=()=>{ if(saved)return; saved=true; const v=inp.value.trim(); if(v)group.title=v; renderAll(); if(v)toast('Group renamed to "'+group.title+'"'); };
+  inp.addEventListener('blur',save);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter')inp.blur(); if(e.key==='Escape'){saved=true;renderAll();} e.stopPropagation(); });
+  inp.addEventListener('click',e=>e.stopPropagation());
 }
+
+/* ── Rename Module ── */
+function startRenameNav(modId){
+  const f=findMod(modId); if(!f)return;
+  const span=document.querySelector(`.nav-title-text[data-mod-id="${modId}"]`); if(!span)return;
+  const inp=document.createElement('input');
+  inp.type='text'; inp.className='nav-title-input'; inp.value=f.mod.title;
+  span.parentNode.replaceChild(inp,span);
+  inp.focus(); inp.select();
+  let saved=false;
+  const save=()=>{ if(saved)return; saved=true; const v=inp.value.trim(); if(v)f.mod.title=v; renderAll(); if(v)toast('Module renamed to "'+f.mod.title+'"'); };
+  inp.addEventListener('blur',save);
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter')inp.blur(); if(e.key==='Escape'){saved=true;renderAll();} e.stopPropagation(); });
+  inp.addEventListener('click',e=>e.stopPropagation());
+}
+
+function selectModule(modId){ selectedModId=modId; renderAll(); }
 
 /* ── Render ── */
-function selectModule(modId) {
-  selectedModId = modId;
-  renderAll();
-}
+function renderAll(){
+  const navList=document.getElementById('nav-module-list');
+  navList.innerHTML='';
+  document.getElementById('sidebar-count').textContent=allMods().length;
 
-function renderAll() {
-  const container = document.getElementById('module-list');
-  container.innerHTML = '';
-
-  // Sidebar nav
-  const navList = document.getElementById('nav-module-list');
-  navList.innerHTML = '';
-  document.getElementById('sidebar-count').textContent = modules.length;
-
-  modules.forEach(mod => {
-
-    // Sidebar entry
-    const navEl = document.createElement('div');
-    navEl.className = 'nav-item' + (selectedModId === mod.id ? ' active' : '');
-    navEl.style.paddingLeft = '32px';
-    navEl.draggable = true;
-    navEl.dataset.modId = mod.id;
-    navEl.innerHTML = `
-      <div class="nav-label" style="font-size:13px;">
-        <span class="nav-drag" style="font-size:11px; cursor:grab;">⠿</span>
-        <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;">${escHtml(mod.title)}</span>
+  groups.forEach(group=>{
+    // Group header
+    const grpEl=document.createElement('div');
+    grpEl.className='group-header';
+    grpEl.dataset.grpId=group.id;
+    grpEl.innerHTML=`
+      <div class="grp-left">
+        <span class="grp-chevron ${group.open?'open':''}">▶</span>
+        <span class="grp-title-text" data-grp-id="${group.id}" title="Double-click to rename">${escHtml(group.title)}</span>
+        <span class="grp-badge">${group.modules.length}</span>
       </div>
-      <button class="nav-del-btn" title="Delete module" onclick="event.stopPropagation(); removeModule('${mod.id}')">✕</button>
+      <div class="grp-actions">
+        <button class="grp-add-btn"    title="Add module" onclick="event.stopPropagation();addModule('${group.id}')">＋</button>
+        <button class="grp-rename-btn" title="Rename group" onclick="event.stopPropagation();startRenameGroup('${group.id}')">✎</button>
+        <button class="grp-del-btn"    title="Delete group" onclick="event.stopPropagation();removeGroup('${group.id}')">✕</button>
+      </div>
     `;
-    navEl.onclick = () => selectModule(mod.id);
+    grpEl.addEventListener('click',()=>toggleGroup(group.id));
+    grpEl.querySelector('.grp-title-text').addEventListener('dblclick',e=>{e.stopPropagation();startRenameGroup(group.id);});
+    navList.appendChild(grpEl);
 
-    navEl.addEventListener('dragstart', e => {
-      dragSrcId = mod.id;
-      navEl.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-    });
-    navEl.addEventListener('dragend', () => {
-      navEl.classList.remove('dragging');
-      document.querySelectorAll('.nav-item.drag-over').forEach(el => el.classList.remove('drag-over'));
-    });
-    navEl.addEventListener('dragover', e => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      document.querySelectorAll('.nav-item.drag-over').forEach(el => el.classList.remove('drag-over'));
-      if (dragSrcId !== mod.id) navEl.classList.add('drag-over');
-    });
-    navEl.addEventListener('dragleave', () => navEl.classList.remove('drag-over'));
-    navEl.addEventListener('drop', e => {
-      e.preventDefault();
-      navEl.classList.remove('drag-over');
-      if (dragSrcId && dragSrcId !== mod.id) {
-        const fromIdx = modules.findIndex(m => m.id === dragSrcId);
-        const toIdx   = modules.findIndex(m => m.id === mod.id);
-        const [moved] = modules.splice(fromIdx, 1);
-        modules.splice(toIdx, 0, moved);
-        dragSrcId = null;
-        renderAll();
-      }
-    });
+    if(!group.open)return;
 
-    navList.appendChild(navEl);
+    group.modules.forEach(mod=>{
+      const navEl=document.createElement('div');
+      navEl.className='nav-item'+(selectedModId===mod.id?' active':'');
+      navEl.draggable=true; navEl.dataset.modId=mod.id;
+      navEl.innerHTML=`
+        <div class="nav-label">
+          <span class="nav-drag">⠿</span>
+          <span class="nav-title-text" data-mod-id="${mod.id}" title="Double-click to rename">${escHtml(mod.title)}</span>
+        </div>
+        <div class="nav-item-actions">
+          <button class="nav-rename-btn" title="Rename" onclick="event.stopPropagation();startRenameNav('${mod.id}')">✎</button>
+          <button class="nav-del-btn"    title="Delete" onclick="event.stopPropagation();removeModule('${mod.id}')">✕</button>
+        </div>
+      `;
+      navEl.onclick=()=>selectModule(mod.id);
+      navEl.querySelector('.nav-title-text').addEventListener('dblclick',e=>{e.stopPropagation();startRenameNav(mod.id);});
+
+      navEl.addEventListener('dragstart',e=>{dragSrcId=mod.id;dragSrcGroupId=group.id;navEl.classList.add('dragging');e.dataTransfer.effectAllowed='move';});
+      navEl.addEventListener('dragend',()=>{navEl.classList.remove('dragging');document.querySelectorAll('.nav-item.drag-over').forEach(el=>el.classList.remove('drag-over'));});
+      navEl.addEventListener('dragover',e=>{e.preventDefault();e.dataTransfer.dropEffect='move';document.querySelectorAll('.nav-item.drag-over').forEach(el=>el.classList.remove('drag-over'));if(dragSrcId!==mod.id)navEl.classList.add('drag-over');});
+      navEl.addEventListener('dragleave',()=>navEl.classList.remove('drag-over'));
+      navEl.addEventListener('drop',e=>{
+        e.preventDefault();navEl.classList.remove('drag-over');
+        if(dragSrcId&&dragSrcId!==mod.id){
+          const srcG=groups.find(g=>g.id===dragSrcGroupId);
+          if(srcG){const fi=srcG.modules.findIndex(m=>m.id===dragSrcId);const[mv]=srcG.modules.splice(fi,1);const ti=group.modules.findIndex(m=>m.id===mod.id);group.modules.splice(ti,0,mv);}
+          dragSrcId=null;dragSrcGroupId=null;renderAll();
+        }
+      });
+      navList.appendChild(navEl);
+    });
   });
 
-  // Show selected module name in main area
-  if (selectedModId) {
-    const mod = modules.find(m => m.id === selectedModId);
-    if (mod) {
-      const title = document.createElement('div');
-      title.style.cssText = 'padding: 40px 20px; font-size: 22px; font-weight: 600; color: #2d3b45;';
-      title.textContent = mod.title;
-      container.appendChild(title);
+  /* Main area */
+  const container=document.getElementById('module-list');
+  container.innerHTML='';
+
+  if(selectedModId){
+    const found=findMod(selectedModId);
+    if(found){
+      const{group,mod}=found;
+
+      // Breadcrumb
+      const bc=document.createElement('div');
+      bc.className='breadcrumb';
+      bc.innerHTML=`
+        <button class="back-btn" onclick="selectedModId=null;renderAll()">← Back</button>
+        <span>›</span>
+        <span style="color:#1a73e8;font-weight:600;">${escHtml(group.title)}</span>
+        <span>›</span>
+        <span>${escHtml(mod.title)}</span>
+      `;
+      container.appendChild(bc);
+
+      const ttl=document.createElement('div'); ttl.className='page-title'; ttl.textContent=mod.title;
+      container.appendChild(ttl);
+
+      if(mod.goal){
+        const gl=document.createElement('div'); gl.className='page-goal'; gl.textContent='🎯 '+mod.goal;
+        container.appendChild(gl);
+      }
+
+      mod.sections.forEach(sec=>{
+        const sb=document.createElement('div'); sb.className='section-block'; sb.style.marginBottom='12px';
+        sb.dataset.secId=sec.id;
+        sb.innerHTML=`
+          <div class="section-header" onclick="toggleSection('${sec.id}')">
+            <span style="color:#1a73e8;">📁</span>
+            <span class="section-title">${escHtml(sec.title)}</span>
+            <span class="section-count">${sec.files.length} file${sec.files.length!==1?'s':''}</span>
+            <span class="section-chevron ${sec.open?'open':''}">▼</span>
+          </div>
+          <div class="section-body ${sec.open?'open':''}">
+            ${sec.files.map((f,i)=>`
+              <div class="file-row">
+                <span class="f-icon">${getIcon(f.name)}</span>
+                <span class="f-name">${escHtml(f.name)}</span>
+                <span class="f-size">${fmtSize(f.size)}</span>
+                <button class="f-remove" onclick="removeFile('${sec.id}',${i})">✕</button>
+              </div>
+            `).join('')}
+            <div class="drop-zone" data-dz="${sec.id}"
+              ondragover="onDragOver(event,'${sec.id}')"
+              ondragleave="onDragLeave(event,'${sec.id}')"
+              ondrop="onDrop(event,'${sec.id}')"
+              onclick="triggerUpload('${sec.id}')">
+              ⬆ Drop files or click to upload
+            </div>
+          </div>
+        `;
+        container.appendChild(sb);
+      });
+
+      const addBtn=document.createElement('button');
+      addBtn.className='add-section-btn';
+      addBtn.textContent='+ Add Section';
+      addBtn.onclick=()=>addSection(mod.id);
+      container.appendChild(addBtn);
+    }
+  } else {
+    // Overview: show all groups with module cards
+    let hasAny=false;
+    groups.forEach(group=>{
+      if(group.modules.length===0)return;
+      hasAny=true;
+      const sec=document.createElement('div'); sec.className='group-section-block';
+      sec.innerHTML=`<div class="group-section-heading">${escHtml(group.title)}</div>`;
+      group.modules.forEach(mod=>{
+        const card=document.createElement('div');
+        card.className='module-card';
+        card.style.marginBottom='8px';
+        card.innerHTML=`
+          <div class="module-card-header">
+            <span style="color:#1a73e8;font-size:16px;">📘</span>
+            <span class="module-card-title">${escHtml(mod.title)}</span>
+            <span class="module-card-count">${mod.sections.length} section${mod.sections.length!==1?'s':''}</span>
+            <span style="color:#bbb;">›</span>
+          </div>
+          ${mod.goal?`<div class="module-card-goal">${escHtml(mod.goal)}</div>`:''}
+        `;
+        card.onclick=()=>selectModule(mod.id);
+        sec.appendChild(card);
+      });
+      container.appendChild(sec);
+    });
+
+    if(!hasAny){
+      container.innerHTML=`
+        <div class="empty-state">
+          <div class="ei">📚</div>
+          <p>No modules yet.<br>Add a group in the sidebar, then use the <strong>＋</strong> button to add modules.</p>
+        </div>
+      `;
     }
   }
 }
 
-function escHtml(str) {
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+/* ── Seed Data ── */
+function mkMod(title,goal,secs){
+  modCounter++;
+  const id='mod-'+modCounter;
+  return{id,title,goal,sections:secs.map(t=>({id:id+'-sec-'+Math.random().toString(36).slice(2),title:t,files:[],open:false})),open:false};
 }
 
-// ── Seed with default ML/DL modules ──
-const defaults = [
-  { title: 'Start Here', goal: 'Course overview, tools setup, and expectations.', sections: ['Course Intro', 'Setup & Environment'] },
-  { title: 'M1: Foundations of ML',    goal: 'Linear models, loss functions, gradient descent.', sections: ['Lecture Slides', 'Lab Notebooks'] },
-  { title: 'M2: Neural Networks',       goal: 'MLP, backpropagation, activation functions.', sections: ['Lecture Slides', 'Lab Notebooks', 'Datasets'] },
-  { title: 'M3: Optimization',          goal: 'SGD, Adam, learning rate schedules, regularization.', sections: ['Lecture Slides', 'Lab Notebooks'] },
-  { title: 'M4: CNNs',                  goal: 'Convolutions, pooling, ResNet, EfficientNet.', sections: ['Lecture Slides', 'Lab Notebooks', 'Datasets'] },
-  { title: 'M5: Transformers & Attention', goal: 'Self-attention, BERT, ViT, scaling laws.', sections: ['Lecture Slides', 'Lab Notebooks'] },
-  { title: 'M6: Efficient AI',          goal: 'Model compression, quantization, pruning, energy-aware training.', sections: ['Lecture Slides', 'Papers', 'Lab Notebooks'] },
-  { title: 'M7: Privacy-Preserving ML', goal: 'Federated learning, differential privacy, secure aggregation.', sections: ['Lecture Slides', 'Papers', 'Lab Notebooks'] },
-];
+groupCounter++; const mlId='grp-'+groupCounter;
+groups.push({id:mlId,title:'Machine Learning',open:true,modules:[
+  mkMod('Start Here',             'Course overview, tools setup, and expectations.',                ['Course Intro','Setup & Environment']),
+  mkMod('M1: Foundations of ML',  'Linear models, loss functions, gradient descent.',              ['Lecture Slides','Lab Notebooks']),
+  mkMod('M3: Optimization',       'SGD, Adam, learning rate schedules, regularization.',           ['Lecture Slides','Lab Notebooks']),
+  mkMod('M7: Privacy-Preserving ML','Federated learning, differential privacy, secure aggregation.',['Lecture Slides','Papers','Lab Notebooks']),
+  mkMod('New ML Module',          '',                                                               []),
+]});
 
-defaults.forEach(d => {
-  modCounter++;
-  const id = 'mod-' + modCounter;
-  const sections = d.sections.map(title => ({
-    id: id + '-sec-' + Math.random().toString(36).slice(2),
-    title, files: [], open: false
-  }));
-  modules.push({ id, title: d.title, goal: d.goal, sections, open: false });
-});
+groupCounter++; const dlId='grp-'+groupCounter;
+groups.push({id:dlId,title:'Deep Learning',open:true,modules:[
+  mkMod('M2: Neural Networks',          'MLP, backpropagation, activation functions.',                     ['Lecture Slides','Lab Notebooks','Datasets']),
+  mkMod('M4: CNNs',                     'Convolutions, pooling, ResNet, EfficientNet.',                    ['Lecture Slides','Lab Notebooks','Datasets']),
+  mkMod('M5: Transformers & Attention', 'Self-attention, BERT, ViT, scaling laws.',                        ['Lecture Slides','Lab Notebooks']),
+  mkMod('M6: Efficient AI',             'Model compression, quantization, pruning, energy-aware training.',['Lecture Slides','Papers','Lab Notebooks']),
+  mkMod('New DL Module',                '',                                                                 []),
+]});
 
 renderAll();
 </script>

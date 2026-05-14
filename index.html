@@ -387,6 +387,30 @@ function startRenameNav(modId){
 
 function selectModule(modId){ selectedModId=modId; renderAll(); }
 
+/* ── Persistence ── */
+const STORAGE_KEY = 'ml_course_canvas_v1';
+
+function saveState(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      groups, groupCounter, modCounter, selectedModId
+    }));
+  } catch(e){ console.warn('Save failed', e); }
+}
+
+function loadState(){
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const s = JSON.parse(raw);
+    groups        = s.groups        || [];
+    groupCounter  = s.groupCounter  || 0;
+    modCounter    = s.modCounter    || 0;
+    selectedModId = s.selectedModId || null;
+    return true;
+  } catch(e){ return false; }
+}
+
 /* ── Render ── */
 function renderAll(){
   const navList=document.getElementById('nav-module-list');
@@ -551,6 +575,7 @@ function renderAll(){
       `;
     }
   }
+  saveState();
 }
 
 /* ── Seed Data ── */
@@ -561,22 +586,27 @@ function mkMod(title,goal,secs){
 }
 
 groupCounter++; const mlId='grp-'+groupCounter;
-groups.push({id:mlId,title:'Machine Learning',open:true,modules:[
+const _seedML = {id:mlId,title:'Machine Learning',open:true,modules:[
   mkMod('Start Here',             'Course overview, tools setup, and expectations.',                ['Course Intro','Setup & Environment']),
   mkMod('M1: Foundations of ML',  'Linear models, loss functions, gradient descent.',              ['Lecture Slides','Lab Notebooks']),
   mkMod('M3: Optimization',       'SGD, Adam, learning rate schedules, regularization.',           ['Lecture Slides','Lab Notebooks']),
   mkMod('M7: Privacy-Preserving ML','Federated learning, differential privacy, secure aggregation.',['Lecture Slides','Papers','Lab Notebooks']),
   mkMod('New ML Module',          '',                                                               []),
-]});
+]};
 
 groupCounter++; const dlId='grp-'+groupCounter;
-groups.push({id:dlId,title:'Deep Learning',open:true,modules:[
+const _seedDL = {id:dlId,title:'Deep Learning',open:true,modules:[
   mkMod('M2: Neural Networks',          'MLP, backpropagation, activation functions.',                     ['Lecture Slides','Lab Notebooks','Datasets']),
   mkMod('M4: CNNs',                     'Convolutions, pooling, ResNet, EfficientNet.',                    ['Lecture Slides','Lab Notebooks','Datasets']),
   mkMod('M5: Transformers & Attention', 'Self-attention, BERT, ViT, scaling laws.',                        ['Lecture Slides','Lab Notebooks']),
   mkMod('M6: Efficient AI',             'Model compression, quantization, pruning, energy-aware training.',['Lecture Slides','Papers','Lab Notebooks']),
   mkMod('New DL Module',                '',                                                                 []),
-]});
+]};
+
+if(!loadState()){
+  // First run — use seed data
+  groups = [_seedML, _seedDL];
+}
 
 renderAll();
 </script>

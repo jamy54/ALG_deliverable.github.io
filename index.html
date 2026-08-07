@@ -6,6 +6,70 @@
   <title>ML/DL Course Manager</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Auth bar (top-right) ── */
+    #auth-bar {
+      position: fixed; top: 10px; right: 14px; z-index: 500;
+      display: flex; align-items: center; gap: 8px;
+    }
+    #auth-status {
+      font-size: 11px; font-weight: 600; color: #555;
+      background: #fff; border: 1px solid #ddd; border-radius: 20px;
+      padding: 4px 10px;
+    }
+    #auth-btn {
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      background: #1a73e8; color: #fff; border: none;
+      border-radius: 20px; padding: 5px 14px;
+    }
+    #auth-btn:hover { background: #1558c0; }
+    body.edit-mode #auth-status { color: #137333; border-color: #b7e0c0; background: #eafaef; }
+    body.edit-mode #auth-btn { background: #eee; color: #555; }
+    body.edit-mode #auth-btn:hover { background: #ddd; }
+
+    /* ── Login modal ── */
+    #login-overlay {
+      position: fixed; inset: 0; z-index: 9999; display: none;
+      background: rgba(11, 61, 145, 0.45);
+      align-items: center; justify-content: center;
+    }
+    #login-overlay.show { display: flex; }
+    #login-box {
+      background: #fff; border-radius: 10px; padding: 28px 26px;
+      width: 320px; box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+      text-align: center; position: relative;
+    }
+    #login-box h1 { font-size: 17px; color: #2d3b45; margin-bottom: 4px; }
+    #login-box p { font-size: 12px; color: #888; margin-bottom: 18px; }
+    #login-pass {
+      width: 100%; padding: 10px 12px; font-size: 14px;
+      border: 1px solid #ccc; border-radius: 6px; margin-bottom: 12px;
+    }
+    #login-pass:focus { outline: none; border-color: #1a73e8; }
+    #login-btn {
+      width: 100%; padding: 10px; font-size: 14px; font-weight: 600;
+      color: #fff; background: #1a73e8; border: none; border-radius: 6px;
+      cursor: pointer;
+    }
+    #login-btn:hover { background: #1558c0; }
+    #login-cancel {
+      margin-top: 10px; font-size: 12px; color: #888;
+      background: none; border: none; cursor: pointer;
+    }
+    #login-cancel:hover { color: #555; text-decoration: underline; }
+    #login-error { color: #d93025; font-size: 12px; margin-top: 10px; min-height: 16px; }
+
+    /* ── View mode: hide all editing controls ── */
+    body:not(.edit-mode) .add-group-btn,
+    body:not(.edit-mode) .grp-add-btn,
+    body:not(.edit-mode) .grp-rename-btn,
+    body:not(.edit-mode) .grp-del-btn,
+    body:not(.edit-mode) .nav-rename-btn,
+    body:not(.edit-mode) .nav-del-btn,
+    body:not(.edit-mode) .f-remove,
+    body:not(.edit-mode) .drop-zone,
+    body:not(.edit-mode) .add-section-btn { display: none !important; }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       font-size: 14px; color: #2d3b45; background: #f5f5f5;
@@ -222,6 +286,22 @@
 </head>
 <body>
 
+<div id="auth-bar">
+  <span id="auth-status">👁 View only</span>
+  <button id="auth-btn" onclick="onAuthBtn()">Log in to edit</button>
+</div>
+
+<div id="login-overlay">
+  <div id="login-box">
+    <h1>Editor Login</h1>
+    <p>Enter the password to edit materials</p>
+    <input type="password" id="login-pass" placeholder="Password" autocomplete="off" />
+    <button id="login-btn" onclick="tryLogin()">Unlock Editing</button>
+    <div id="login-error"></div>
+    <button id="login-cancel" onclick="closeLogin()">Cancel</button>
+  </div>
+</div>
+
 <div id="sidebar">
   <h2>Learning Modules</h2>
 
@@ -246,6 +326,58 @@
 <div class="toast" id="toast"></div>
 
 <script>
+/* ── Auth / edit-mode gate ── */
+const APP_PASSWORD = 'ALG26AKS';
+const AUTH_KEY = 'ml_course_auth_v1';
+let editMode = false;
+
+function isEditMode(){ return editMode; }
+
+function applyMode(){
+  document.body.classList.toggle('edit-mode', editMode);
+  document.getElementById('auth-status').textContent = editMode ? '✏️ Editing' : '👁 View only';
+  document.getElementById('auth-btn').textContent   = editMode ? 'Log out' : 'Log in to edit';
+  if(typeof renderAll === 'function') renderAll();
+}
+
+function onAuthBtn(){ editMode ? logout() : openLogin(); }
+
+function openLogin(){
+  document.getElementById('login-error').textContent = '';
+  document.getElementById('login-pass').value = '';
+  document.getElementById('login-overlay').classList.add('show');
+  document.getElementById('login-pass').focus();
+}
+function closeLogin(){ document.getElementById('login-overlay').classList.remove('show'); }
+
+function tryLogin(){
+  const val = document.getElementById('login-pass').value;
+  if(val === APP_PASSWORD){
+    editMode = true;
+    sessionStorage.setItem(AUTH_KEY, '1');
+    closeLogin();
+    applyMode();
+  } else {
+    document.getElementById('login-error').textContent = 'Incorrect password.';
+    document.getElementById('login-pass').value = '';
+  }
+}
+
+function logout(){
+  editMode = false;
+  sessionStorage.removeItem(AUTH_KEY);
+  selectedModId = null;
+  applyMode();
+}
+
+document.getElementById('login-pass').addEventListener('keydown', e => {
+  if(e.key === 'Enter') tryLogin();
+  if(e.key === 'Escape') closeLogin();
+});
+
+// Restore editor session if it was active in this browser session
+if(sessionStorage.getItem(AUTH_KEY) === '1') editMode = true;
+
 let groups = [];
 let groupCounter = 0;
 let modCounter = 0;
@@ -272,6 +404,7 @@ function allMods(){ return groups.flatMap(g=>g.modules); }
 
 /* ── Add Group ── */
 function addGroup(){
+  if(!isEditMode())return;
   groupCounter++;
   const id='grp-'+groupCounter;
   groups.push({id,title:'New Group',open:true,modules:[]});
@@ -281,6 +414,7 @@ function addGroup(){
 
 /* ── Add Module ── */
 function addModule(groupId){
+  if(!isEditMode())return;
   const g=groups.find(g=>g.id===groupId);
   if(!g)return;
   modCounter++;
@@ -292,6 +426,7 @@ function addModule(groupId){
 
 /* ── Remove Group ── */
 function removeGroup(groupId){
+  if(!isEditMode())return;
   const g=groups.find(g=>g.id===groupId);
   if(!g)return;
   if(g.modules.some(m=>m.id===selectedModId))selectedModId=null;
@@ -302,6 +437,7 @@ function removeGroup(groupId){
 
 /* ── Remove Module ── */
 function removeModule(modId){
+  if(!isEditMode())return;
   for(const g of groups){
     const i=g.modules.findIndex(m=>m.id===modId);
     if(i!==-1){
@@ -320,6 +456,7 @@ function toggleGroup(groupId){
 
 /* ── File handling ── */
 function handleFiles(files,secId){
+  if(!isEditMode())return;
   for(const mod of allMods()){
     const sec=mod.sections.find(s=>s.id===secId);
     if(sec){
@@ -331,9 +468,10 @@ function handleFiles(files,secId){
 function onDragOver(e,sid){ e.preventDefault(); const d=document.querySelector(`[data-dz="${sid}"]`); if(d)d.classList.add('dragover'); }
 function onDragLeave(e,sid){ const d=document.querySelector(`[data-dz="${sid}"]`); if(d)d.classList.remove('dragover'); }
 function onDrop(e,sid){ e.preventDefault(); onDragLeave(e,sid); handleFiles(e.dataTransfer.files,sid); }
-function triggerUpload(secId){ const i=document.createElement('input'); i.type='file'; i.multiple=true; i.onchange=()=>handleFiles(i.files,secId); i.click(); }
+function triggerUpload(secId){ if(!isEditMode())return; const i=document.createElement('input'); i.type='file'; i.multiple=true; i.onchange=()=>handleFiles(i.files,secId); i.click(); }
 
 function addSection(modId){
+  if(!isEditMode())return;
   const f=findMod(modId); if(!f)return;
   const sid=modId+'-sec-'+Date.now();
   f.mod.sections.push({id:sid,title:'New Section',files:[],open:true});
@@ -342,6 +480,7 @@ function addSection(modId){
 }
 
 function removeFile(secId,idx){
+  if(!isEditMode())return;
   for(const mod of allMods()){
     const sec=mod.sections.find(s=>s.id===secId);
     if(sec){sec.files.splice(idx,1);renderAll();return;}
@@ -357,6 +496,7 @@ function toggleSection(secId){
 
 /* ── Rename Group ── */
 function startRenameGroup(groupId){
+  if(!isEditMode())return;
   const group=groups.find(g=>g.id===groupId); if(!group)return;
   const span=document.querySelector(`.grp-title-text[data-grp-id="${groupId}"]`); if(!span)return;
   const inp=document.createElement('input');
@@ -372,6 +512,7 @@ function startRenameGroup(groupId){
 
 /* ── Rename Module ── */
 function startRenameNav(modId){
+  if(!isEditMode())return;
   const f=findMod(modId); if(!f)return;
   const span=document.querySelector(`.nav-title-text[data-mod-id="${modId}"]`); if(!span)return;
   const inp=document.createElement('input');
@@ -443,7 +584,7 @@ function renderAll(){
     group.modules.forEach(mod=>{
       const navEl=document.createElement('div');
       navEl.className='nav-item'+(selectedModId===mod.id?' active':'');
-      navEl.draggable=true; navEl.dataset.modId=mod.id;
+      navEl.draggable=isEditMode(); navEl.dataset.modId=mod.id;
       navEl.innerHTML=`
         <div class="nav-label">
           <span class="nav-drag">⠿</span>
@@ -463,6 +604,7 @@ function renderAll(){
       navEl.addEventListener('dragleave',()=>navEl.classList.remove('drag-over'));
       navEl.addEventListener('drop',e=>{
         e.preventDefault();navEl.classList.remove('drag-over');
+        if(!isEditMode())return;
         if(dragSrcId&&dragSrcId!==mod.id){
           const srcG=groups.find(g=>g.id===dragSrcGroupId);
           if(srcG){const fi=srcG.modules.findIndex(m=>m.id===dragSrcId);const[mv]=srcG.modules.splice(fi,1);const ti=group.modules.findIndex(m=>m.id===mod.id);group.modules.splice(ti,0,mv);}
@@ -608,7 +750,7 @@ if(!loadState()){
   groups = [_seedML, _seedDL];
 }
 
-renderAll();
+applyMode();
 </script>
 </body>
 </html>

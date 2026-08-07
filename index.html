@@ -67,7 +67,7 @@
     body:not(.edit-mode) .nav-rename-btn,
     body:not(.edit-mode) .nav-del-btn,
     body:not(.edit-mode) .f-remove,
-    body:not(.edit-mode) .drop-zone,
+    body:not(.edit-mode) .link-add,
     body:not(.edit-mode) .add-section-btn { display: none !important; }
 
     body {
@@ -220,17 +220,25 @@
     }
     .file-row:hover { background: #fafafa; }
     .f-icon { font-size: 15px; }
-    .f-name { flex: 1; color: #2d3b45; }
-    .f-size { color: #aaa; font-size: 11px; }
+    .f-name { flex: 1; color: #1a73e8; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .f-name:hover { text-decoration: underline; }
     .f-remove { background: none; border: none; color: #ccc; cursor: pointer; font-size: 13px; padding: 2px 5px; border-radius: 3px; }
     .f-remove:hover { background: #fee; color: #c0392b; }
 
-    .drop-zone {
-      margin: 10px 16px 10px 40px; border: 2px dashed #d0d0d0; border-radius: 4px;
-      padding: 12px; text-align: center; color: #aaa; font-size: 12px;
-      cursor: pointer; transition: all 0.15s;
+    .link-add {
+      display: flex; gap: 6px; margin: 10px 16px 10px 40px; flex-wrap: wrap;
     }
-    .drop-zone:hover, .drop-zone.dragover { border-color: #1a73e8; color: #1a73e8; background: #f0f4ff; }
+    .link-add input {
+      padding: 7px 9px; font-size: 12px; border: 1px solid #d0d0d0; border-radius: 4px;
+    }
+    .link-add input.lnk-name { width: 150px; }
+    .link-add input.lnk-url  { flex: 1; min-width: 160px; }
+    .link-add input:focus { outline: none; border-color: #1a73e8; }
+    .link-add button {
+      padding: 7px 14px; font-size: 12px; font-weight: 600; color: #fff;
+      background: #1a73e8; border: none; border-radius: 4px; cursor: pointer;
+    }
+    .link-add button:hover { background: #1558c0; }
 
     /* Breadcrumb + back button */
     .breadcrumb {
@@ -390,8 +398,8 @@ const FILE_ICONS = {
   csv:'📋', zip:'📦', mp4:'🎬', png:'🖼️', pt:'⚙️', h5:'🗃️', default:'📁'
 };
 
-function getExt(n){ return n.split('.').pop().toLowerCase(); }
-function getIcon(n){ return FILE_ICONS[getExt(n)] || FILE_ICONS.default; }
+function getExt(n){ return String(n).split(/[?#]/)[0].split('.').pop().toLowerCase(); }
+function getIcon(n){ return FILE_ICONS[getExt(n)] || '🔗'; }
 function fmtSize(b){ if(b<1024)return b+' B'; if(b<1048576)return(b/1024).toFixed(1)+' KB'; return(b/1048576).toFixed(1)+' MB'; }
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
@@ -454,21 +462,25 @@ function toggleGroup(groupId){
   if(g){g.open=!g.open; renderAll();}
 }
 
-/* ── File handling ── */
-function handleFiles(files,secId){
+/* ── Link handling ── */
+function addLink(secId){
   if(!isEditMode())return;
+  const nameEl=document.querySelector(`[data-lnk-name="${secId}"]`);
+  const urlEl =document.querySelector(`[data-lnk-url="${secId}"]`);
+  if(!nameEl||!urlEl)return;
+  let name=nameEl.value.trim();
+  let url =urlEl.value.trim();
+  if(!url){ toast('Enter a URL.'); urlEl.focus(); return; }
+  if(!/^https?:\/\//i.test(url)) url='https://'+url;  // be forgiving about missing scheme
+  if(!name) name=url;                                 // fall back to URL as the label
   for(const mod of allMods()){
     const sec=mod.sections.find(s=>s.id===secId);
     if(sec){
-      [...files].forEach(f=>{ if(!sec.files.find(x=>x.name===f.name))sec.files.push({name:f.name,size:f.size}); });
-      renderAll(); toast('Files added.'); return;
+      sec.files.push({name,url});
+      renderAll(); toast('Link added.'); return;
     }
   }
 }
-function onDragOver(e,sid){ e.preventDefault(); const d=document.querySelector(`[data-dz="${sid}"]`); if(d)d.classList.add('dragover'); }
-function onDragLeave(e,sid){ const d=document.querySelector(`[data-dz="${sid}"]`); if(d)d.classList.remove('dragover'); }
-function onDrop(e,sid){ e.preventDefault(); onDragLeave(e,sid); handleFiles(e.dataTransfer.files,sid); }
-function triggerUpload(secId){ if(!isEditMode())return; const i=document.createElement('input'); i.type='file'; i.multiple=true; i.onchange=()=>handleFiles(i.files,secId); i.click(); }
 
 function addSection(modId){
   if(!isEditMode())return;
@@ -651,24 +663,21 @@ function renderAll(){
           <div class="section-header" onclick="toggleSection('${sec.id}')">
             <span style="color:#1a73e8;">📁</span>
             <span class="section-title">${escHtml(sec.title)}</span>
-            <span class="section-count">${sec.files.length} file${sec.files.length!==1?'s':''}</span>
+            <span class="section-count">${sec.files.length} link${sec.files.length!==1?'s':''}</span>
             <span class="section-chevron ${sec.open?'open':''}">▼</span>
           </div>
           <div class="section-body ${sec.open?'open':''}">
             ${sec.files.map((f,i)=>`
               <div class="file-row">
-                <span class="f-icon">${getIcon(f.name)}</span>
-                <span class="f-name">${escHtml(f.name)}</span>
-                <span class="f-size">${fmtSize(f.size)}</span>
+                <span class="f-icon">${getIcon(f.url||f.name)}</span>
+                <a class="f-name" href="${escHtml(f.url||'#')}" target="_blank" rel="noopener noreferrer">${escHtml(f.name)}</a>
                 <button class="f-remove" onclick="removeFile('${sec.id}',${i})">✕</button>
               </div>
             `).join('')}
-            <div class="drop-zone" data-dz="${sec.id}"
-              ondragover="onDragOver(event,'${sec.id}')"
-              ondragleave="onDragLeave(event,'${sec.id}')"
-              ondrop="onDrop(event,'${sec.id}')"
-              onclick="triggerUpload('${sec.id}')">
-              ⬆ Drop files or click to upload
+            <div class="link-add">
+              <input class="lnk-name" data-lnk-name="${sec.id}" placeholder="Label (e.g. Lecture 1 Slides)" onkeydown="if(event.key==='Enter')addLink('${sec.id}')" />
+              <input class="lnk-url"  data-lnk-url="${sec.id}"  placeholder="https://..." onkeydown="if(event.key==='Enter')addLink('${sec.id}')" />
+              <button onclick="addLink('${sec.id}')">+ Add Link</button>
             </div>
           </div>
         `;

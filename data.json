@@ -39,8 +39,17 @@
             {
               "id": "mod-2-sec-0xhkaw3nca1f",
               "title": "Lab Notebooks",
-              "files": [],
-              "open": false
+              "files": [
+                {
+                  "name": "Understanding Data Types",
+                  "url": "https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/02.01-Understanding-Data-Types.ipynb"
+                },
+                {
+                  "name": "Numpy Basics",
+                  "url": "https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/02.02-The-Basics-Of-NumPy-Arrays.ipynb"
+                }
+              ],
+              "open": true
             }
           ],
           "open": false
@@ -54,13 +63,13 @@
               "id": "mod-3-sec-nz9dxynohe",
               "title": "Lecture Slides",
               "files": [],
-              "open": false
+              "open": true
             },
             {
               "id": "mod-3-sec-bojqiyfavfu",
               "title": "Lab Notebooks",
               "files": [],
-              "open": false
+              "open": true
             }
           ],
           "open": false

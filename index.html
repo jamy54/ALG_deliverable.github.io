@@ -23,6 +23,13 @@
       border-radius: 20px; padding: 5px 14px;
     }
     #auth-btn:hover { background: #1558c0; }
+    .auth-edit-only {
+      display: none; font-size: 12px; font-weight: 600; cursor: pointer;
+      background: #fff; color: #1a73e8; border: 1px solid #cdd9f0;
+      border-radius: 20px; padding: 5px 12px;
+    }
+    .auth-edit-only:hover { background: #f0f4ff; }
+    body.edit-mode .auth-edit-only { display: inline-block; }
     body.edit-mode #auth-status { color: #137333; border-color: #b7e0c0; background: #eafaef; }
     body.edit-mode #auth-btn { background: #eee; color: #555; }
     body.edit-mode #auth-btn:hover { background: #ddd; }
@@ -296,6 +303,8 @@
 
 <div id="auth-bar">
   <span id="auth-status">👁 View only</span>
+  <button class="auth-edit-only" onclick="exportData()">⬇ Export data.json</button>
+  <button class="auth-edit-only" onclick="reloadPublished()">↻ Reload published</button>
   <button id="auth-btn" onclick="onAuthBtn()">Log in to edit</button>
 </div>
 
@@ -371,10 +380,11 @@ function tryLogin(){
   }
 }
 
-function logout(){
+async function logout(){
   editMode = false;
   sessionStorage.removeItem(AUTH_KEY);
   selectedModId = null;
+  await fetchPublished();   // return to the public view
   applyMode();
 }
 
@@ -542,26 +552,60 @@ function selectModule(modId){ selectedModId=modId; renderAll(); }
 
 /* ── Persistence ── */
 const STORAGE_KEY = 'ml_course_canvas_v1';
+const DATA_URL = 'data.json';   // global published content, committed to the repo
 
-function saveState(){
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({
-      groups, groupCounter, modCounter, selectedModId
-    }));
-  } catch(e){ console.warn('Save failed', e); }
+function serialize(){ return { groups, groupCounter, modCounter }; }
+
+function applyData(s){
+  groups       = s.groups       || [];
+  groupCounter = s.groupCounter || 0;
+  modCounter   = s.modCounter   || 0;
 }
 
-function loadState(){
+// Only editors keep a private local draft; viewers never persist anything.
+function saveDraft(){
+  if(!editMode) return;
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(serialize())); }
+  catch(e){ console.warn('Save failed', e); }
+}
+function hasDraft(){ try { return !!localStorage.getItem(STORAGE_KEY); } catch(e){ return false; } }
+function loadDraft(){
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) return false;
-    const s = JSON.parse(raw);
-    groups        = s.groups        || [];
-    groupCounter  = s.groupCounter  || 0;
-    modCounter    = s.modCounter    || 0;
-    selectedModId = s.selectedModId || null;
+    applyData(JSON.parse(raw));
     return true;
   } catch(e){ return false; }
+}
+
+// Fetch the globally published content everyone sees.
+async function fetchPublished(){
+  try {
+    const res = await fetch(DATA_URL + '?t=' + Date.now(), { cache: 'no-store' });
+    if(!res.ok) throw new Error('no data.json');
+    applyData(await res.json());
+    return true;
+  } catch(e){ return false; }
+}
+
+// Publish: download data.json for the editor to commit to the repo.
+function exportData(){
+  if(!editMode) return;
+  const blob = new Blob([JSON.stringify(serialize(), null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Exported data.json — commit it to your repo to publish.');
+}
+
+// Discard the local draft and reload the committed version.
+async function reloadPublished(){
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+  const ok = await fetchPublished();
+  renderAll();
+  toast(ok ? 'Loaded the published version.' : 'No data.json found in the repo yet.');
 }
 
 /* ── Render ── */
@@ -726,7 +770,7 @@ function renderAll(){
       `;
     }
   }
-  saveState();
+  saveDraft();
 }
 
 /* ── Seed Data ── */
@@ -754,12 +798,16 @@ const _seedDL = {id:dlId,title:'Deep Learning',open:true,modules:[
   mkMod('New DL Module',                '',                                                                 []),
 ]};
 
-if(!loadState()){
-  // First run — use seed data
-  groups = [_seedML, _seedDL];
-}
-
-applyMode();
+(async function boot(){
+  const ok = await fetchPublished();
+  if(!ok){
+    // No data.json in the repo yet — start from seed content for first-time setup
+    groups = [_seedML, _seedDL];
+  }
+  // An editor's unpublished local draft takes precedence during an editing session
+  if(editMode && hasDraft()) loadDraft();
+  applyMode();
+})();
 </script>
 </body>
 </html>

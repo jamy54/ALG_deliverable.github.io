@@ -1,0 +1,218 @@
+{
+  "groups": [
+    {
+      "id": "grp-1",
+      "title": "Machine Learning",
+      "open": true,
+      "modules": [
+        {
+          "id": "mod-1",
+          "title": "Start Here",
+          "goal": "Course overview, tools setup, and expectations.",
+          "sections": [
+            {
+              "id": "mod-1-sec-lu5c26q94wc",
+              "title": "Course Intro",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-1-sec-45dl8i6nemi",
+              "title": "Setup & Environment",
+              "files": [],
+              "open": false
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-2",
+          "title": "M1: Foundations of ML",
+          "goal": "Linear models, loss functions, gradient descent.",
+          "sections": [
+            {
+              "id": "mod-2-sec-ue40615p16m",
+              "title": "Lecture Slides",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-2-sec-0xhkaw3nca1f",
+              "title": "Lab Notebooks",
+              "files": [],
+              "open": false
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-3",
+          "title": "M3: Optimization",
+          "goal": "SGD, Adam, learning rate schedules, regularization.",
+          "sections": [
+            {
+              "id": "mod-3-sec-nz9dxynohe",
+              "title": "Lecture Slides",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-3-sec-bojqiyfavfu",
+              "title": "Lab Notebooks",
+              "files": [],
+              "open": false
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-4",
+          "title": "M7: Privacy-Preserving ML",
+          "goal": "Federated learning, differential privacy, secure aggregation.",
+          "sections": [
+            {
+              "id": "mod-4-sec-zcdb271sgt",
+              "title": "Lecture Slides",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-4-sec-82pmnl997lx",
+              "title": "Papers",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-4-sec-vzskmw4ugr",
+              "title": "Lab Notebooks",
+              "files": [],
+              "open": false
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-5",
+          "title": "New ML Module",
+          "goal": "",
+          "sections": [],
+          "open": false
+        }
+      ]
+    },
+    {
+      "id": "grp-2",
+      "title": "Deep Learning",
+      "open": true,
+      "modules": [
+        {
+          "id": "mod-6",
+          "title": "M2: Neural Networks",
+          "goal": "MLP, backpropagation, activation functions.",
+          "sections": [
+            {
+              "id": "mod-6-sec-z3wuivg17xc",
+              "title": "Lecture Slides",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-6-sec-8q1d2dwpehn",
+              "title": "Lab Notebooks",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-6-sec-c3jnri1ietr",
+              "title": "Datasets",
+              "files": [],
+              "open": false
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-7",
+          "title": "M4: CNNs",
+          "goal": "Convolutions, pooling, ResNet, EfficientNet.",
+          "sections": [
+            {
+              "id": "mod-7-sec-pr85q7ak00r",
+              "title": "Lecture Slides",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-7-sec-h50u8mx420m",
+              "title": "Lab Notebooks",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-7-sec-qfb4ui6igjo",
+              "title": "Datasets",
+              "files": [],
+              "open": false
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-8",
+          "title": "M5: Transformers & Attention",
+          "goal": "Self-attention, BERT, ViT, scaling laws.",
+          "sections": [
+            {
+              "id": "mod-8-sec-xtbo8izt5t",
+              "title": "Lecture Slides",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-8-sec-4zu85oslksd",
+              "title": "Lab Notebooks",
+              "files": [],
+              "open": false
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-9",
+          "title": "M6: Efficient AI",
+          "goal": "Model compression, quantization, pruning, energy-aware training.",
+          "sections": [
+            {
+              "id": "mod-9-sec-lre1k6t8d7",
+              "title": "Lecture Slides",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-9-sec-p9gy7h3wjal",
+              "title": "Papers",
+              "files": [],
+              "open": false
+            },
+            {
+              "id": "mod-9-sec-s7n7kmj1od",
+              "title": "Lab Notebooks",
+              "files": [],
+              "open": false
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-10",
+          "title": "New DL Module",
+          "goal": "",
+          "sections": [],
+          "open": false
+        }
+      ]
+    }
+  ],
+  "groupCounter": 2,
+  "modCounter": 10
+}

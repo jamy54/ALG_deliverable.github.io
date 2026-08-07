@@ -55,8 +55,91 @@
           "open": false
         },
         {
+          "id": "mod-11",
+          "title": "M2: Unsupervised Algorithm",
+          "goal": "",
+          "sections": [
+            {
+              "id": "mod-11-sec-1786126824296",
+              "title": "New Section",
+              "files": [],
+              "open": true
+            },
+            {
+              "id": "mod-11-sec-1786126839876",
+              "title": "New Section",
+              "files": [
+                {
+                  "name": "Hierarchical Clustering",
+                  "url": "https://colab.research.google.com/drive/1q825Hni0cmIA_My2YlRPVuMiupjB1vml"
+                }
+              ],
+              "open": true
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-12",
+          "title": "M3: Supervised Learning",
+          "goal": "",
+          "sections": [
+            {
+              "id": "mod-12-sec-1786126920078",
+              "title": "New Section",
+              "files": [],
+              "open": true
+            },
+            {
+              "id": "mod-12-sec-1786126920979",
+              "title": "New Section",
+              "files": [
+                {
+                  "name": "Logistic Regression",
+                  "url": "https://colab.research.google.com/drive/1dadzFkV_dJKzEQupZvV0WRpe2Oyd5twp"
+                },
+                {
+                  "name": "Decision Tree",
+                  "url": "https://colab.research.google.com/drive/1HehNtPUHQJ2jM_j4adQRx3FOsi8qbWQr"
+                }
+              ],
+              "open": true
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-13",
+          "title": "M4: Evaluation",
+          "goal": "",
+          "sections": [
+            {
+              "id": "mod-13-sec-1786127003418",
+              "title": "New Section",
+              "files": [],
+              "open": true
+            },
+            {
+              "id": "mod-13-sec-1786127004567",
+              "title": "New Section",
+              "files": [
+                {
+                  "name": "Evaluation Metrics: Confusion Matrix, F1, ROC Curve",
+                  "url": "https://colab.research.google.com/drive/1Q02VpIzexjdsGiMyIZ7VlGb-5ij5QQ5z"
+                },
+                {
+                  "name": "Cross Validation",
+                  "url": "https://colab.research.google.com/drive/1zuVfuhpEVc_Mt6XpgHEae5mGVu2BCxU2"
+                }
+              ],
+              "open": true
+            }
+          ],
+          "open": false
+        },
+        {
           "id": "mod-3",
-          "title": "M3: Optimization",
+          "title": "M6: Optimization",
           "goal": "SGD, Adam, learning rate schedules, regularization.",
           "sections": [
             {
@@ -223,5 +306,5 @@
     }
   ],
   "groupCounter": 2,
-  "modCounter": 10
+  "modCounter": 13
 }

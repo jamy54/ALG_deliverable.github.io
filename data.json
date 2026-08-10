@@ -26,6 +26,25 @@
           "open": false
         },
         {
+          "id": "mod-15",
+          "title": "Syllabus",
+          "goal": "",
+          "sections": [
+            {
+              "id": "mod-15-sec-1786362223129",
+              "title": "New Section",
+              "files": [
+                {
+                  "name": "OER Syllabus",
+                  "url": "https://docs.google.com/document/d/1WylgGVYHAAZkrMcdIwJfWAr-bCLaC3nt/edit"
+                }
+              ],
+              "open": true
+            }
+          ],
+          "open": false
+        },
+        {
           "id": "mod-2",
           "title": "M1: Foundations of ML",
           "goal": "Linear models, loss functions, gradient descent.",
@@ -110,7 +129,7 @@
         },
         {
           "id": "mod-13",
-          "title": "M4: Evaluation",
+          "title": "M3: Evaluation",
           "goal": "",
           "sections": [
             {
@@ -135,6 +154,20 @@
               "open": true
             }
           ],
+          "open": false
+        },
+        {
+          "id": "mod-16",
+          "title": "M6: Support Vector Machine",
+          "goal": "",
+          "sections": [],
+          "open": false
+        },
+        {
+          "id": "mod-5",
+          "title": "M6: Ensemle Approach",
+          "goal": "",
+          "sections": [],
           "open": false
         },
         {
@@ -182,13 +215,6 @@
             }
           ],
           "open": false
-        },
-        {
-          "id": "mod-5",
-          "title": "New ML Module",
-          "goal": "",
-          "sections": [],
-          "open": false
         }
       ]
     },
@@ -197,6 +223,13 @@
       "title": "Deep Learning",
       "open": true,
       "modules": [
+        {
+          "id": "mod-14",
+          "title": "Syllabus",
+          "goal": "",
+          "sections": [],
+          "open": false
+        },
         {
           "id": "mod-6",
           "title": "M2: Neural Networks",
@@ -306,5 +339,5 @@
     }
   ],
   "groupCounter": 2,
-  "modCounter": 13
+  "modCounter": 16
 }

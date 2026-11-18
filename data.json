@@ -160,19 +160,92 @@
           "id": "mod-16",
           "title": "M6: Support Vector Machine",
           "goal": "",
-          "sections": [],
+          "sections": [
+            {
+              "id": "mod-16-sec-1795028564602",
+              "title": "New Section",
+              "files": [
+                {
+                  "name": "SVM Hands on",
+                  "url": "https://colab.research.google.com/drive/1ScnDkEn9KFJPSVXQdOxzLPArhkJr3580"
+                }
+              ],
+              "open": true
+            }
+          ],
           "open": false
         },
         {
           "id": "mod-5",
           "title": "M6: Ensemle Approach",
           "goal": "",
+          "sections": [
+            {
+              "id": "mod-5-sec-1795028593582",
+              "title": "New Section",
+              "files": [
+                {
+                  "name": "Ensemble Hands on",
+                  "url": "https://colab.research.google.com/drive/1RemUhuJ23SmkCaHO5t9s4rSiPIpq_6cF"
+                }
+              ],
+              "open": true
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-17",
+          "title": "M7:Neural network",
+          "goal": "",
+          "sections": [
+            {
+              "id": "mod-17-sec-1795028795996",
+              "title": "New Section",
+              "files": [
+                {
+                  "name": "NN Hands on Mnist",
+                  "url": "https://colab.research.google.com/drive/1BqoyguNYNlkbrmr04DJ9NSwUPuCYpD6x?usp=sharing"
+                }
+              ],
+              "open": true
+            }
+          ],
+          "open": false
+        },
+        {
+          "id": "mod-18",
+          "title": "M8:CNN",
+          "goal": "",
           "sections": [],
           "open": false
         },
         {
+          "id": "mod-19",
+          "title": "M9:Deep Learning",
+          "goal": "",
+          "sections": [
+            {
+              "id": "mod-19-sec-1795029279304",
+              "title": "New Section",
+              "files": [
+                {
+                  "name": "GAN",
+                  "url": "https://colab.research.google.com/drive/1_QwvLs-fZRq7LgAkPR0NWHUYstCyQPkk"
+                },
+                {
+                  "name": "Diffusion Model",
+                  "url": "https://colab.research.google.com/drive/1lbpOsvfbQCeYdZrUQX1X24ckBEnOhA7W"
+                }
+              ],
+              "open": true
+            }
+          ],
+          "open": false
+        },
+        {
           "id": "mod-3",
-          "title": "M6: Optimization",
+          "title": "M10: Optimization",
           "goal": "SGD, Adam, learning rate schedules, regularization.",
           "sections": [
             {
@@ -192,7 +265,7 @@
         },
         {
           "id": "mod-4",
-          "title": "M7: Privacy-Preserving ML",
+          "title": "M11: Privacy-Preserving ML",
           "goal": "Federated learning, differential privacy, secure aggregation.",
           "sections": [
             {
@@ -339,5 +412,5 @@
     }
   ],
   "groupCounter": 2,
-  "modCounter": 16
+  "modCounter": 19
 }
